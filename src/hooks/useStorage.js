@@ -1,0 +1,15 @@
+export default function useStorage(key, initialValue) {
+    const getItem = (key, defaultValue=null) => {
+        const item = localStorage.getItem(key)
+        if (item) return JSON.parse(item)
+            return defaultValue
+    }
+    const setItem = (key, value) => {
+        localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value))
+    }
+
+    return {
+        getItem,
+        setItem
+    }
+}

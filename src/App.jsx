@@ -1,26 +1,32 @@
-import SearchForm from './components/SearchForm.jsx'
 import './assets/scss/app.scss'
-import { Container } from 'react-bootstrap'
-import { useState } from 'react'
+import { Container, Navbar, Nav } from 'react-bootstrap'
+import { toast, ToastContainer } from 'react-toastify'
+import { Outlet, NavLink } from 'react-router'
+
 
 
 function App() {
-  const [moviesList, setMoviesList] = useState([])
-  const searchHandler = async (search) => {
-    const type = 'movie'
-    const year = ''
-    const response = await fetch(`https://www.omdbapi.com/?apikey=${import.meta.env.VITE_API_KEY}&s=${search}&type=${type}&y=${year}`);
-    const data = await response.json();
-    setMoviesList(data.Search)
-    console.log(data.Search);
-  }
 
   return (
-    <Container className='my-4'>
-      <h1>Movie App</h1>
-      <SearchForm onSearch={searchHandler} />
-    </Container>
+    <>
+      <Navbar bg="dark" variant="dark" expand="lg">
+        <Container>
+          <Navbar.Brand href="#">Movies App</Navbar.Brand>
+          <Nav className="me-auto my-2 my-lg-0">
+            <NavLink className="me-3" to="/">Home</NavLink>
+            <NavLink to="/about">About</NavLink>
+          </Nav>
+        </Container>
+      </Navbar>
+      <Container className='my-4'>
+        <Outlet />
+      </Container>
+      <ToastContainer position="top-center" autoClose={3000} theme="dark" />
+
+    </>
   )
 }
 
+
 export default App
+
