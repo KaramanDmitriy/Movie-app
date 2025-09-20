@@ -37,6 +37,6 @@ export default function DetailPage() {
     if (!data) return null
 
     return (
-        <h1>{data.name}</h1>
+        <h1>{data.name || data.title}</h1>
     )
 }

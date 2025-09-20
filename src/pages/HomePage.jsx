@@ -18,7 +18,7 @@ export default function HomePage() {
     const [totalItems, setTotalItems] = useState(0)
     const [inProgress, setInProgress] = useState(false)
     const [search, setSearch] = useState('')
-    const { getItem, setItem } = useStorage()
+    const { getStorageItem, setStorageItem } = useStorage()
     const [type, setType] = useState('')
 
     const searchHandler = async (params) => {
@@ -34,8 +34,9 @@ export default function HomePage() {
     const searchMovies = async (search, type, page) => {
         if (!search || !type) return false
         setInProgress(true)
-        const storeKey = search.replaceAll(' ', '_') + '_' + type + '_' + page
-        const cachedList = getItem(storeKey)
+        const storeKey = search.replaceAll(' ', '-').replaceAll('_', '-') + '_' + type + '_' + page
+
+        const cachedList = getStorageItem(storeKey, null, 'session')
         if (cachedList) {
             setMoviesList(cachedList.results)
             setTotalPages(cachedList.total_pages)
@@ -56,7 +57,8 @@ export default function HomePage() {
             const response = await fetch(url, options);
             if (response.ok) {
                 const data = await response.json();
-                setItem(storeKey, data)
+                data.total_results && setStorageItem('storeKey', storeKey, 'session')
+                data.total_results && setStorageItem(storeKey, data, 'session')
                 setMoviesList(data.results)
                 setTotalPages(data.total_pages)
                 setTotalItems(data.total_results)
@@ -73,10 +75,24 @@ export default function HomePage() {
             setInProgress(false)
         }
     }
-
-    // useEffect(() => {
-    //     searchMovies()
-    // }, [page, search, type])
+    const storedSearch = () => {
+        const storeKey = getStorageItem('storeKey', null, 'session')
+        if (storeKey) {
+            const cachedList = getStorageItem(storeKey, null, 'session')
+            if (cachedList) {
+                setMoviesList(cachedList.results)
+                setTotalPages(cachedList.total_pages)
+                setTotalItems(cachedList.total_results)
+                const [search, type, page] = storeKey.split('_')
+                setSearch(search)
+                setType(type)
+                setPage(page)
+            }
+        }
+    }
+    useEffect(() => {
+        storedSearch()
+    }, [])
 
     return (
         <>
