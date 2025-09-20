@@ -8,18 +8,20 @@ import { toast } from "react-toastify";
 import useStorage from "../hooks/useStorage.js";
 import { createContext } from "react";
 import CustomPagination from "../components/CustomPagination.jsx";
+import { useCommonStore } from "../store.js";
 
 export const TypeContext = createContext()
 
 export default function HomePage() {
-    const [moviesList, setMoviesList] = useState([])
+    const store = useCommonStore()
+    const [moviesList, setMoviesList] = useState(store.moviesList)
     const [page, setPage] = useState(1)
-    const [totalPages, setTotalPages] = useState(0)
-    const [totalItems, setTotalItems] = useState(0)
+    const [totalPages, setTotalPages] = useState(store.totalPages)
+    const [totalItems, setTotalItems] = useState(store.totalResults)
     const [inProgress, setInProgress] = useState(false)
-    const [search, setSearch] = useState('')
+    const [search, setSearch] = useState(store.searchQuery)
     const { getStorageItem, setStorageItem } = useStorage()
-    const [type, setType] = useState('')
+    const [type, setType] = useState(store.searchType)
 
     const searchHandler = async (params) => {
         setType(params.type)
@@ -41,6 +43,9 @@ export default function HomePage() {
             setMoviesList(cachedList.results)
             setTotalPages(cachedList.total_pages)
             setTotalItems(cachedList.total_results)
+            store.setMoviesList(cachedList.results)
+            store.setTotalPages(cachedList.total_pages)
+            store.setTotalResults(cachedList.total_results)
             setInProgress(false)
             return
         }
@@ -63,6 +68,10 @@ export default function HomePage() {
                 setTotalPages(data.total_pages)
                 setTotalItems(data.total_results)
 
+                store.setMoviesList(data.results)
+                store.setTotalPages(data.total_pages)
+                store.setTotalResults(data.total_results)
+
             } else {
                 throw new Error(`Error fetching data. Status: ${response.status}`);
             }
@@ -80,10 +89,15 @@ export default function HomePage() {
         if (storeKey) {
             const cachedList = getStorageItem(storeKey, null, 'session')
             if (cachedList) {
+                store.setMoviesList(cachedList.results)
+                store.setTotalPages(cachedList.total_pages)
+                store.setTotalResults(cachedList.total_results)
                 setMoviesList(cachedList.results)
                 setTotalPages(cachedList.total_pages)
                 setTotalItems(cachedList.total_results)
                 const [search, type, page] = storeKey.split('_')
+                store.setSearchQuery(search)
+                store.setSearchType(type)
                 setSearch(search)
                 setType(type)
                 setPage(page)
