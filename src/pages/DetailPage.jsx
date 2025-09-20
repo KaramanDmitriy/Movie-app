@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
+import { toast } from "react-toastify";
+
 export default function DetailPage() {
     const params = useParams();
-    const [item, setItem] = useState(null);
-    console.log(params);
 
     const fetchData = async () => {
         const url = `https://api.themoviedb.org/3/${params.type}/${params.id}`;
@@ -17,25 +17,26 @@ export default function DetailPage() {
 
         try {
             const response = await fetch(url, options);
+
             if (response.ok) {
                 const data = await response.json();
-                setItem(data);
-
+                return data;
             } else {
-                throw new Error(`Error fetching data. Status: ${response.status}`);
+                throw new Error(response.status);
             }
         }
-        catch (error) {
+        catch (err) {
             toast.error('Some error occured. ')
         }
     }
-    useEffect(() => {
-        fetchData()
-    }, [params])
+    const { data } = useQuery({
+        queryKey: ['detail'],
+        queryFn: fetchData
+    })
 
+    if (!data) return null
 
-    if (!item) return null
     return (
-        <h1>{item.title}</h1>
+        <h1>{data.name}</h1>
     )
 }

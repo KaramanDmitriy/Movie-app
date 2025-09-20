@@ -2,8 +2,9 @@ import './assets/scss/app.scss'
 import { Container, Navbar, Nav } from 'react-bootstrap'
 import { toast, ToastContainer } from 'react-toastify'
 import { Outlet, NavLink } from 'react-router'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 
-
+const queryClient = new QueryClient()
 
 function App() {
 
@@ -19,7 +20,9 @@ function App() {
         </Container>
       </Navbar>
       <Container className='my-4'>
-        <Outlet />
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
       </Container>
       <ToastContainer position="top-center" autoClose={3000} theme="dark" />
 
