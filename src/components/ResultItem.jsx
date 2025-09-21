@@ -8,11 +8,11 @@ import useStorage from "../hooks/useStorage.js";
 
 
 
-export default function ResultItem({ data }) {
+export default function ResultItem({ data, favCallback }) {
     const type = data.type || useContext(TypeContext)
     const IMG_BASE = 'https://image.tmdb.org/t/p/w500/'
     const { setStorageItem, getStorageItem } = useStorage()
-    const [isInFav, setIsInFav] = useState(Boolean(getStorageItem('favorites', []).find(el => el.id === data.id)))
+    const [isInFav, setIsInFav] = useState(Boolean(getStorageItem('favorites', []).find(el => el.id === data.id && el.type === type)))
 
 
     let title = '', date = '', imageSrc = ''
@@ -37,7 +37,7 @@ export default function ResultItem({ data }) {
     }
     const favHandler = () => {
         const favItems = getStorageItem('favorites', [])
-        const favIndex = favItems.findIndex(el => el.id === data.id)
+        const favIndex = favItems.findIndex(el => el.id === data.id && el.type === type)
         if (favIndex !== -1) {
             setIsInFav(false)
             setStorageItem('favorites', favItems.toSpliced(favIndex, 1))
@@ -47,11 +47,16 @@ export default function ResultItem({ data }) {
                 id: data.id,
                 type,
                 [type === 'movie' ? 'title' : 'name']: title,
-                [type === 'movie' ? 'release_date' : 'first_air_date']: date,
-                [type === 'person' ? 'profile_path' : 'poster_path']: imageSrc
+                [type === 'movie' ? 'release_date' : 'first_air_date']: date
+            }
+            if (type === 'person') {
+                favItem.profile_path = data.profile_path
+            } else {
+                favItem.poster_path = data.poster_path
             }
             setStorageItem('favorites', [...favItems, favItem])
         }
+        favCallback && favCallback()
 
     }
 
