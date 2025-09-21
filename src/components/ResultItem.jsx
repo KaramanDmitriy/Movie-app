@@ -1,14 +1,19 @@
-import { Card } from "react-bootstrap";
+import { Card, Button } from "react-bootstrap";
 import noImage from './../assets/images/reklama.jpg'
 import { formanDate } from "../helpers";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { TypeContext } from "../pages/HomePage.jsx";
 import { NavLink } from "react-router";
+import useStorage from "../hooks/useStorage.js";
+
 
 
 export default function ResultItem({ data }) {
-    const type = useContext(TypeContext)
+    const type = data.type || useContext(TypeContext)
     const IMG_BASE = 'https://image.tmdb.org/t/p/w500/'
+    const { setStorageItem, getStorageItem } = useStorage()
+    const [isInFav, setIsInFav] = useState(Boolean(getStorageItem('favorites', []).find(el => el.id === data.id)))
+
 
     let title = '', date = '', imageSrc = ''
     switch (type) {
@@ -30,6 +35,25 @@ export default function ResultItem({ data }) {
         default:
             return <p>Unknown type</p>
     }
+    const favHandler = () => {
+        const favItems = getStorageItem('favorites', [])
+        const favIndex = favItems.findIndex(el => el.id === data.id)
+        if (favIndex !== -1) {
+            setIsInFav(false)
+            setStorageItem('favorites', favItems.toSpliced(favIndex, 1))
+        } else {
+            setIsInFav(true)
+            const favItem = {
+                id: data.id,
+                type,
+                [type === 'movie' ? 'title' : 'name']: title,
+                [type === 'movie' ? 'release_date' : 'first_air_date']: date,
+                [type === 'person' ? 'profile_path' : 'poster_path']: imageSrc
+            }
+            setStorageItem('favorites', [...favItems, favItem])
+        }
+
+    }
 
     return (
         <Card className="mb-3">
@@ -40,8 +64,8 @@ export default function ResultItem({ data }) {
                 <Card.Text>
                     {date && <time datatime={date} >{formanDate(date)}</time> || data.known_for_department}
                 </Card.Text>
-                {/* <Button data-id={data.id}>Detail</Button> */}
                 <NavLink to={`/detail/${type}/${data.id}`} className={'btn btn-info'}>Detail</NavLink>
+                <Button className='btn btn-danger ms-3' onClick={favHandler} >{isInFav ? '❤︎' : '♡'}</Button>
             </Card.Body>
         </Card >
     )

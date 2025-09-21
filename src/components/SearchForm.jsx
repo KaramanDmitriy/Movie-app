@@ -4,6 +4,7 @@ import '../assets/scss/SearchForm.scss'
 import { toast } from 'react-toastify'
 import { useCommonStore } from './../store'
 
+
 export default function SearchForm(props) {
     const { searchQuery, searchType, setSearchQuery, setSearchType } = useCommonStore()
     const [search, setSearch] = useState(searchQuery)
