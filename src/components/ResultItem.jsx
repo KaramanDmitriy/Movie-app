@@ -12,7 +12,8 @@ export default function ResultItem({ data, favCallback }) {
     const type = data.type || useContext(TypeContext)
     const IMG_BASE = 'https://image.tmdb.org/t/p/w500/'
     const { setStorageItem, getStorageItem } = useStorage()
-    const [isInFav, setIsInFav] = useState(Boolean(getStorageItem('favorites', []).find(el => el.id === data.id && el.type === type)))
+    const favList = getStorageItem('favorites', [])
+    const [isInFav, setIsInFav] = useState(Boolean(favList.find(el => el.id === data.id && el.type === type)))
 
 
     let title = '', date = '', imageSrc = ''
@@ -39,10 +40,10 @@ export default function ResultItem({ data, favCallback }) {
         const favItems = getStorageItem('favorites', [])
         const favIndex = favItems.findIndex(el => el.id === data.id && el.type === type)
         if (favIndex !== -1) {
-            setIsInFav(false)
+            favCallback === undefined && setIsInFav(false)
             setStorageItem('favorites', favItems.toSpliced(favIndex, 1))
         } else {
-            setIsInFav(true)
+            favCallback === undefined && setIsInFav(true)
             const favItem = {
                 id: data.id,
                 type,
