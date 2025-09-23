@@ -3,6 +3,7 @@ import { Container, Navbar, Nav } from 'react-bootstrap'
 import { toast, ToastContainer } from 'react-toastify'
 import { Outlet, NavLink } from 'react-router'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import ThemeSwitcher from './components/ThemeSwitcher'
 
 const queryClient = new QueryClient()
 
@@ -18,6 +19,7 @@ function App() {
             <NavLink to="/about" className="me-3">About</NavLink>
             <NavLink to="/favorites">Favorites</NavLink>
           </Nav>
+          <ThemeSwitcher />
         </Container>
       </Navbar>
       <Container className='my-4'>
